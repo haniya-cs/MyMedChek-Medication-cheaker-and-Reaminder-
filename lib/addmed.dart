@@ -4,7 +4,8 @@ import 'recurrence.dart';
 
 class AddMedDialog extends StatefulWidget {
   final Function(Medicine) onAdd;
-  const AddMedDialog({super.key, required this.onAdd});
+  final Medicine? existingMed;
+  const AddMedDialog({super.key, required this.onAdd,this.existingMed});
   @override
   State<AddMedDialog> createState() => _AddMedDialogState();
 }
@@ -21,6 +22,22 @@ class _AddMedDialogState extends State<AddMedDialog> {
   int? intervalDays = 1;
   int? dayOfMonth = DateTime.now().day;
   DateTime? targetDate;
+  //
+  @override
+  void initState() {
+    super.initState();
+    final med = widget.existingMed;
+    if (med != null) {
+      nameController.text = med.name;
+      doseController.text = med.dose;
+      selectedTimes = List.from(med.times);
+      selectedRecurrence = med.recurrence;
+      selectedDaysOfWeek = med.daysOfWeek ?? [];
+      intervalDays = med.intervalDays;
+      dayOfMonth = med.dayOfMonth ?? DateTime.now().day;
+      targetDate = med.targetDate;
+    }
+  }//
 
   InputDecoration fieldStyle(String label) {
     return InputDecoration(
@@ -403,7 +420,7 @@ class _AddMedDialogState extends State<AddMedDialog> {
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
           ),
-          child: const Text("Add"),
+          child: Text(widget.existingMed != null ? "Save" : "Add"),
         ),
       ],
     );

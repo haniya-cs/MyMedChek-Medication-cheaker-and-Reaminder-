@@ -3,7 +3,6 @@ import 'notification.dart';
 import 'splash.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService.init();
   runApp(const MedCheckApp());
 }
 
@@ -13,6 +12,7 @@ class MedCheckApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: NotificationService.messengerKey,
       title: 'MyMedCheck',
       home: const SplashScreen(),
       debugShowCheckedModeBanner: false,

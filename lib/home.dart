@@ -13,30 +13,33 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Medicine> meds = [];
+
   void addMedication(Medicine med) {
     setState(() => meds.add(med));
     final result = InteractionService.check(meds);
     if (result != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ $result"), backgroundColor: Colors.red,
-            duration: const Duration(days: 1),action: SnackBarAction(
-              label: 'Dismiss',
-              textColor: Colors.white,
-              onPressed: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              },
-            ),
-          ));
+        SnackBar(
+          content: Text("⚠️ $result"),
+          backgroundColor: Colors.red,
+          duration: const Duration(days: 1),
+          action: SnackBarAction(
+            label: 'Dismiss',
+            textColor: Colors.white,
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
+          ),
+        ),
+      );
     }
-
-    NotificationService.scheduleMedicine(medicine: med);
+    NotificationService.scheduleMedicine(med);
   }
 
   void deleteMedication(int i) {
-    final medToDelete = meds[i];
-    NotificationService.cancelAllReminders(medToDelete.id);
     setState(() => meds.removeAt(i));
   }
+
   String weekdayName(int day) {
     switch(day) {
       case 1: return "Mon";
@@ -56,21 +59,16 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (med.recurrence) {
       case RecurrenceType.daily:
         return "Daily at $timeString";
-
       case RecurrenceType.dayOfWeek:
         final days = med.daysOfWeek!.map(weekdayName).join(', ');
         return "Weekly on $days at $timeString";
-
       case RecurrenceType.everyXDays:
         final interval = med.intervalDays ?? 1;
         return "Every $interval days at $timeString";
-
       case RecurrenceType.once:
         return "Once at $timeString";
-
       case RecurrenceType.monthly:
         return "Monthly at $timeString";
-
     }
   }
 
@@ -78,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Medications", style:TextStyle(color: Colors.white)),
+        title: const Text("My Medications", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
       ),
       floatingActionButton: FloatingActionButton(
@@ -93,9 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             height: double.infinity,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
-                image: const AssetImage('assets/back.jpg'),
+                image: AssetImage('assets/back.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -105,23 +103,21 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child:SizedBox(
+                child: SizedBox(
                   width: 350,
                   child: ElevatedButton.icon(
                     onPressed: () {
                       final result = InteractionService.check(meds);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(result ?? "No interactions.Your List is Safe ✔"),
-                          backgroundColor:
-                          result == null ? Colors.blue : Colors.red,
+                          content: Text(result ?? "No interactions. Your list is safe ✔"),
+                          backgroundColor: result == null ? Colors.blue : Colors.red,
                           duration: const Duration(seconds: 6),
                         ),
                       );
                     },
                     icon: const Icon(Icons.search),
-                    label: const Text("Check Interactions"
-                    ),
+                    label: const Text("Check Interactions"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
@@ -131,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              // Medication List
               Expanded(
                 child: meds.isEmpty
                     ? const Center(
@@ -150,28 +145,46 @@ class _HomeScreenState extends State<HomeScreen> {
                     final med = meds[i];
                     return Card(
                       color: Colors.white,
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: ListTile(
-                        leading: const Icon(Icons.medication, color: Colors
-                            .blue),
+                        leading: const Icon(Icons.medication, color: Colors.blue),
                         title: Text(
-                          meds[i].name,
+                          med.name,
                           style: const TextStyle(
                               color: Colors.blue, fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
-                          "Dose: ${med.dose}\n${_getScheduleDescription(
-                              med)}",
+                          "Dose: ${med.dose}\n${_getScheduleDescription(med)}",
                           style: const TextStyle(color: Colors.blue),
-
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.blue),
-                          onPressed: () => deleteMedication(i),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AddMedDialog(
+                                    existingMed: med,
+                                    onAdd: (editedMed) {
+                                      setState(() {
+                                        meds[i] = editedMed;
+                                      });
+                                      NotificationService.scheduleMedicine(editedMed);
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.blue),
+                              onPressed: () => deleteMedication(i),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -184,8 +197,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 }
-
-
-
