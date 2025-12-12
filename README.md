@@ -1,16 +1,9 @@
 # my_med_check
+The project aims to improve patient safety and adherence by
+creating a system that not only reminds users to take their medications on time but also checks for
+potential drug–drug interactions.
+## to use you should create your account and login
 
-A new Flutter project.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
